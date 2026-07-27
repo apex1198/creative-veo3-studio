@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const nav = [
   ["⌂", "Tổng quan"],
@@ -25,6 +25,22 @@ export default function Home() {
   const [jobs, setJobs] = useState(seedJobs);
   const [notice, setNotice] = useState("");
   const [query, setQuery] = useState("");
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("creative-veo3-jobs");
+      if (saved) setJobs(JSON.parse(saved));
+    } catch {
+      // Keep the bundled starter jobs if local data is unavailable.
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem("creative-veo3-jobs", JSON.stringify(jobs));
+  }, [hydrated, jobs]);
 
   const filtered = useMemo(
     () => jobs.filter((job) => `${job.name} ${job.id}`.toLowerCase().includes(query.toLowerCase())),
